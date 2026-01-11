@@ -228,3 +228,135 @@ export function calculateNorthStarMetrics(): NorthStarMetrics {
     history,
   };
 }
+
+// Learning Repository - Pattern Recognition
+export type FailurePattern =
+  | "HYPOTHESIS_TOO_OPTIMISTIC"
+  | "UNDERESTIMATED_EFFORT"
+  | "WRONG_SUCCESS_METRIC"
+  | "IGNORED_USER_FEEDBACK"
+  | "SCOPE_CREEP"
+  | "INSUFFICIENT_EVIDENCE";
+
+export interface LearningPattern {
+  id: string;
+  pattern: FailurePattern;
+  label: string;
+  description: string;
+  occurrences: number;
+  lastSeen: Date;
+  examples: {
+    cycleId: string;
+    cycleTitle: string;
+    lesson: string;
+  }[];
+  recommendation: string;
+}
+
+export interface LearningInsight {
+  totalFailures: number;
+  patternsIdentified: number;
+  mostCommonPattern: LearningPattern;
+  improvementRate: number; // % reduction in pattern occurrence
+  topLessons: string[];
+}
+
+// Mock Learning Patterns
+export const mockLearningPatterns: LearningPattern[] = [
+  {
+    id: "pattern_1",
+    pattern: "HYPOTHESIS_TOO_OPTIMISTIC",
+    label: "Overly Optimistic Hypotheses",
+    description: "Setting unrealistic success criteria that couldn't be achieved",
+    occurrences: 8,
+    lastSeen: new Date("2025-12-15"),
+    examples: [
+      {
+        cycleId: "cycle_historical_1",
+        cycleTitle: "Redesign entire checkout flow",
+        lesson: "Predicted 50% conversion increase, achieved only 12%. Reality check: incremental improvements work better."
+      },
+      {
+        cycleId: "cycle_historical_2",
+        cycleTitle: "New AI-powered search",
+        lesson: "Expected 80% user adoption, got 23%. Users prefer familiar patterns over fancy features."
+      }
+    ],
+    recommendation: "Use historical data to set realistic baselines. Add 20% buffer to effort estimates."
+  },
+  {
+    id: "pattern_2",
+    pattern: "UNDERESTIMATED_EFFORT",
+    label: "Underestimated Engineering Effort",
+    description: "Scope was larger than anticipated, causing missed deadlines",
+    occurrences: 6,
+    lastSeen: new Date("2025-11-28"),
+    examples: [
+      {
+        cycleId: "cycle_historical_3",
+        cycleTitle: "Real-time collaboration feature",
+        lesson: "Estimated 2 weeks, took 8 weeks. WebSocket complexity underestimated."
+      }
+    ],
+    recommendation: "Break large features into smaller decision cycles. Get engineering estimates before committing."
+  },
+  {
+    id: "pattern_3",
+    pattern: "WRONG_SUCCESS_METRIC",
+    label: "Measuring the Wrong Thing",
+    description: "Optimized for metrics that didn't reflect actual user value",
+    occurrences: 5,
+    lastSeen: new Date("2025-10-20"),
+    examples: [
+      {
+        cycleId: "cycle_historical_4",
+        cycleTitle: "Gamification badges",
+        lesson: "Tracked badge collection rate (high), ignored actual user engagement (dropped 15%)."
+      }
+    ],
+    recommendation: "Define both leading indicators AND lagging business outcomes. Watch for Goodhart's Law."
+  },
+  {
+    id: "pattern_4",
+    pattern: "IGNORED_USER_FEEDBACK",
+    label: "Ignored Early User Signals",
+    description: "Proceeded despite negative user feedback during beta",
+    occurrences: 4,
+    lastSeen: new Date("2025-09-10"),
+    examples: [
+      {
+        cycleId: "cycle_historical_5",
+        cycleTitle: "New navigation menu",
+        lesson: "Beta users complained it was confusing. We shipped anyway. Had to rollback after 1 week."
+      }
+    ],
+    recommendation: "Set clear thresholds: if >30% of beta users report confusion, iterate before full launch."
+  },
+];
+
+export function getLearningInsights(): LearningInsight {
+  const totalFailures = mockLearningPatterns.reduce((sum, p) => sum + p.occurrences, 0);
+  const patternsIdentified = mockLearningPatterns.length;
+  const mostCommonPattern = mockLearningPatterns.reduce((prev, current) =>
+    current.occurrences > prev.occurrences ? current : prev
+  );
+
+  // Mock improvement rate (showing learning over time)
+  const improvementRate = 34; // 34% reduction in pattern occurrences over 6 months
+
+  const topLessons = [
+    "Start with smaller scope, validate, then expand",
+    "Get engineering estimates BEFORE writing hypothesis",
+    "Define success metrics with finance/analytics team",
+    "Set clear beta feedback thresholds (>30% negative = stop)",
+    "Use historical data to reality-check optimistic predictions"
+  ];
+
+  return {
+    totalFailures,
+    patternsIdentified,
+    mostCommonPattern,
+    improvementRate,
+    topLessons,
+  };
+}

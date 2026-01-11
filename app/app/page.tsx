@@ -85,6 +85,10 @@ export default function DashboardPage() {
               <h1 className="text-xl font-bold">Decision OS</h1>
             </Link>
             <div className="flex items-center gap-4">
+              <Link href="/app/learning" className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 text-accent-dark rounded-lg text-sm font-medium hover:bg-accent/20 transition-colors">
+                <span>🧠</span>
+                <span>Learning</span>
+              </Link>
               <span className="text-sm text-neutral-600">{user.name}</span>
               <button
                 onClick={() => {
