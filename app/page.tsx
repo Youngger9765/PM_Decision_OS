@@ -44,7 +44,7 @@ export default function LandingPage() {
 
           <h1 className="text-5xl lg:text-7xl font-bold mb-6 leading-tight">
             Turn product decisions into
-            <span className="block bg-gradient-primary-to-accent bg-clip-text text-transparent">
+            <span className="block text-primary">
               actionable outcomes
             </span>
           </h1>
