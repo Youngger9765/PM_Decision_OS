@@ -1,0 +1,245 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  workspaceMembers WorkspaceMember[]
+  ownedCycles      DecisionCycle[]
+  auditEvents      AuditEvent[]
+  subscription     Subscription?
+  accounts         Account[]
+  sessions         Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members  WorkspaceMember[]
+  projects Project[]
+}
+
+model WorkspaceMember {
+  id          String   @id @default(cuid())
+  role        Role     @default(MEMBER)
+  workspaceId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([workspaceId, userId])
+}
+
+enum Role {
+  OWNER
+  MEMBER
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  workspaceId String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace        Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  githubConnection GitHubConnection?
+  decisionCycles   DecisionCycle[]
+}
+
+model GitHubConnection {
+  id             String   @id @default(cuid())
+  projectId      String   @unique
+  repoOwner      String
+  repoName       String
+  installationId String?
+  accessToken    String // encrypted
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model DecisionCycle {
+  id          String              @id @default(cuid())
+  title       String
+  status      DecisionCycleStatus @default(DRAFTING)
+  projectId   String
+  ownerUserId String
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  project              Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  owner                User                  @relation(fields: [ownerUserId], references: [id])
+  hypothesisDefinition HypothesisDefinition?
+  executionEvidences   ExecutionEvidence[]
+  decisionReview       DecisionReview?
+  decisionOutcome      DecisionOutcome?
+  auditEvents          AuditEvent[]
+}
+
+enum DecisionCycleStatus {
+  DRAFTING
+  EXECUTING
+  REVIEW
+  OUTCOME
+  CLOSED
+}
+
+model HypothesisDefinition {
+  id              String    @id @default(cuid())
+  decisionCycleId String    @unique
+  hypothesis      String    @db.Text
+  successCriteria String    @db.Text
+  outOfScope      String?   @db.Text
+  lockedAt        DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  decisionCycle DecisionCycle @relation(fields: [decisionCycleId], references: [id], onDelete: Cascade)
+}
+
+model ExecutionEvidence {
+  id              String       @id @default(cuid())
+  decisionCycleId String
+  type            EvidenceType
+  referenceUrl    String?
+  status          String?
+  conclusion      String?
+  metadata        Json?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  decisionCycle DecisionCycle @relation(fields: [decisionCycleId], references: [id], onDelete: Cascade)
+}
+
+enum EvidenceType {
+  CI_RUN
+  PREVIEW_URL
+  ARTIFACT
+}
+
+model DecisionReview {
+  id              String        @id @default(cuid())
+  decisionCycleId String        @unique
+  verdict         ReviewVerdict
+  comment         String?       @db.Text
+  createdAt       DateTime      @default(now())
+
+  decisionCycle DecisionCycle @relation(fields: [decisionCycleId], references: [id], onDelete: Cascade)
+}
+
+enum ReviewVerdict {
+  VALIDATED
+  NOT_VALIDATED
+}
+
+model DecisionOutcome {
+  id              String      @id @default(cuid())
+  decisionCycleId String      @unique
+  outcome         OutcomeType
+  notes           String?     @db.Text
+  githubIssueUrl  String?
+  githubPrUrl     String?
+  createdAt       DateTime    @default(now())
+
+  decisionCycle DecisionCycle @relation(fields: [decisionCycleId], references: [id], onDelete: Cascade)
+}
+
+enum OutcomeType {
+  PROCEED
+  ITERATE
+  STOP
+}
+
+model AuditEvent {
+  id              String   @id @default(cuid())
+  decisionCycleId String
+  userId          String
+  action          String
+  metadata        Json?
+  createdAt       DateTime @default(now())
+
+  decisionCycle DecisionCycle @relation(fields: [decisionCycleId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  stripeCustomerId     String             @unique
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(INACTIVE)
+  plan                 SubscriptionPlan?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  INACTIVE
+}
+
+enum SubscriptionPlan {
+  STARTER
+  PRO
+}
