@@ -5,10 +5,19 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { getMockCycle } from "@/lib/mock-data";
 
+interface KeyResult {
+  metric: string;
+  target: string;
+  baseline?: string;
+  achieved?: number;
+}
+
 export default function CycleDetailPage() {
   const router = useRouter();
   const params = useParams();
   const [user, setUser] = useState<any>(null);
+  const [krAchieved, setKrAchieved] = useState<{ [key: number]: number }>({});
+  const [autoVerdict, setAutoVerdict] = useState<"VALIDATED" | "NOT_VALIDATED" | null>(null);
 
   useEffect(() => {
     const mockUser = localStorage.getItem("mockUser");
@@ -23,6 +32,48 @@ export default function CycleDetailPage() {
 
   const cycle = getMockCycle(params.id as string);
   if (!cycle) return <div>Cycle not found</div>;
+
+  const parseSuccessCriteriaToOKR = (criteriaText: string): KeyResult[] => {
+    const lines = criteriaText.split('\n').filter(line => line.trim().startsWith('-'));
+    return lines.map(line => {
+      const cleaned = line.replace(/^-\s*/, '').trim();
+      let metric = cleaned;
+      let target = '';
+      let baseline = undefined;
+
+      const operators = ['≥', '>=', '≤', '<=', '>', '<', '='];
+      for (const op of operators) {
+        if (cleaned.includes(op)) {
+          const parts = cleaned.split(op);
+          metric = parts[0].trim();
+          target = op + ' ' + parts[1].split('(')[0].trim();
+          const baselineMatch = cleaned.match(/\(.*?baseline.*?(\d+\.?\d*%?)\)/i);
+          if (baselineMatch) baseline = baselineMatch[1];
+          break;
+        }
+      }
+
+      if (!target) {
+        const increaseMatch = cleaned.match(/(increases?|improves?|grows?)\s+(?:by\s+)?(\d+\.?\d*%?)/i);
+        const decreaseMatch = cleaned.match(/(reduces?|decreases?|drops?)\s+(?:by\s+)?(\d+\.?\d*%?)/i);
+        if (increaseMatch) target = '+' + increaseMatch[2];
+        else if (decreaseMatch) target = '-' + decreaseMatch[2];
+      }
+
+      return { metric, target, baseline, achieved: undefined };
+    });
+  };
+
+  const calculateKRAchievement = (keyResults: KeyResult[]): number => {
+    const totalKRs = keyResults.length;
+    if (totalKRs === 0) return 0;
+    const achievedCount = Object.values(krAchieved).filter(val => val === 100).length;
+    return Math.round((achievedCount / totalKRs) * 100);
+  };
+
+  const getAutoVerdict = (achievementRate: number): "VALIDATED" | "NOT_VALIDATED" => {
+    return achievementRate >= 70 ? "VALIDATED" : "NOT_VALIDATED";
+  };
 
   const getStatusConfig = (status: string) => {
     switch (status) {
@@ -307,33 +358,112 @@ export default function CycleDetailPage() {
                       Reviewed {cycle.review.createdAt.toLocaleString()}
                     </div>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    <p className="text-neutral-600 text-sm mb-4">Compare evidence against success criteria. Was the hypothesis validated?</p>
-                    <div>
-                      <label className="block font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-3">Verdict</label>
-                      <div className="flex gap-3">
-                        <button className="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover-lift transition-smooth shadow-sm">
-                          ✓ VALIDATED
-                        </button>
-                        <button className="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover-lift transition-smooth shadow-sm">
-                          ✗ NOT VALIDATED
-                        </button>
+                ) : (() => {
+                  const keyResults = parseSuccessCriteriaToOKR(cycle.hypothesis.successCriteria);
+                  const achievementRate = calculateKRAchievement(keyResults);
+                  const suggestedVerdict = getAutoVerdict(achievementRate);
+
+                  return (
+                    <div className="space-y-6">
+                      <p className="text-neutral-600 text-sm mb-4">Compare evidence against success criteria. Track Key Results achievement to auto-validate.</p>
+
+                      {/* KR Tracking */}
+                      {keyResults.length > 0 && (
+                        <div className="space-y-4">
+                          <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide">Key Results Tracking</h3>
+                          <div className="space-y-3">
+                            {keyResults.map((kr, idx) => (
+                              <div key={idx} className="bg-neutral-50 border border-neutral-200 rounded-lg p-4">
+                                <div className="flex items-start justify-between gap-4 mb-3">
+                                  <div className="flex-1">
+                                    <div className="font-medium text-neutral-900 mb-1">{kr.metric}</div>
+                                    <div className="flex items-center gap-3 text-sm">
+                                      <span className="text-neutral-500">Target: <span className="font-semibold text-success">{kr.target}</span></span>
+                                      {kr.baseline && (
+                                        <span className="text-neutral-500">Baseline: <span className="font-semibold">{kr.baseline}</span></span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <label className="text-xs text-neutral-600 font-medium">Achieved:</label>
+                                    <select
+                                      value={krAchieved[idx] || 0}
+                                      onChange={(e) => {
+                                        const newKrAchieved = { ...krAchieved, [idx]: parseInt(e.target.value) };
+                                        setKrAchieved(newKrAchieved);
+                                      }}
+                                      className="px-3 py-1.5 border border-neutral-300 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    >
+                                      <option value={0}>0% ✗</option>
+                                      <option value={100}>100% ✓</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Achievement Summary */}
+                          <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-xl p-6">
+                            <div className="flex items-center justify-between mb-4">
+                              <div>
+                                <div className="text-sm font-semibold text-neutral-600 uppercase tracking-wide mb-1">Overall Achievement</div>
+                                <div className="text-4xl font-bold text-primary">{achievementRate}%</div>
+                                <div className="text-xs text-neutral-600 mt-1">
+                                  {Object.values(krAchieved).filter(v => v === 100).length} of {keyResults.length} KRs achieved
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <div className={`text-2xl font-bold ${suggestedVerdict === "VALIDATED" ? "text-success" : "text-error"}`}>
+                                  {suggestedVerdict === "VALIDATED" ? "✓ VALIDATED" : "✗ NOT VALIDATED"}
+                                </div>
+                                <div className="text-xs text-neutral-600 mt-1">Auto-suggested (≥70% = validated)</div>
+                              </div>
+                            </div>
+
+                            {achievementRate < 70 && achievementRate > 0 && (
+                              <div className="pt-4 border-t border-primary/20 flex items-start gap-2 text-sm text-neutral-700">
+                                <span>💡</span>
+                                <span>Need {Math.ceil((70 - achievementRate) / (100 / keyResults.length))} more KR(s) to reach 70% threshold for validation.</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Manual Verdict Override */}
+                      <div>
+                        <label className="block font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-3">
+                          Final Verdict {keyResults.length > 0 && <span className="text-neutral-500 font-normal">(or override auto-suggestion)</span>}
+                        </label>
+                        <div className="flex gap-3">
+                          <button className="px-6 py-2 bg-green-600 text-white rounded-lg text-sm font-semibold hover-lift transition-smooth shadow-sm">
+                            ✓ VALIDATED
+                          </button>
+                          <button className="px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-semibold hover-lift transition-smooth shadow-sm">
+                            ✗ NOT VALIDATED
+                          </button>
+                        </div>
                       </div>
+
+                      <div>
+                        <label className="block font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Analysis</label>
+                        <textarea
+                          className="w-full border border-neutral-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          rows={4}
+                          placeholder={keyResults.length > 0
+                            ? `Based on ${achievementRate}% achievement rate, explain your verdict...`
+                            : "Explain your verdict based on the evidence collected..."
+                          }
+                        />
+                      </div>
+
+                      <button className="px-6 py-3 bg-purple-600 text-white rounded-lg text-sm font-semibold hover-lift transition-smooth shadow-sm">
+                        Submit Review
+                      </button>
                     </div>
-                    <div>
-                      <label className="block font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Analysis</label>
-                      <textarea
-                        className="w-full border border-neutral-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                        rows={4}
-                        placeholder="Explain your verdict based on the evidence collected..."
-                      />
-                    </div>
-                    <button className="px-6 py-3 bg-purple-600 text-white rounded-lg text-sm font-semibold hover-lift transition-smooth shadow-sm">
-                      Submit Review
-                    </button>
-                  </div>
-                )}
+                  );
+                })()}
               </div>
             </div>
           </div>
