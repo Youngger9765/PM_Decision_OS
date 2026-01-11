@@ -5,11 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { mockProjects } from "@/lib/mock-data";
 
-type Step = "project" | "title" | "hypothesis" | "criteria" | "scope" | "confirm";
+type Step = "project" | "title" | "rice" | "hypothesis" | "criteria" | "scope" | "confirm";
 
 interface FormData {
   projectId: string;
   title: string;
+  reach: number;
+  impact: number;
+  confidence: number;
+  effort: number;
+  riceScore: number;
   hypothesis: string;
   successCriteria: string;
   outOfScope: string;
@@ -22,6 +27,11 @@ export default function NewDecisionPage() {
   const [formData, setFormData] = useState<FormData>({
     projectId: "",
     title: "",
+    reach: 0,
+    impact: 1,
+    confidence: 80,
+    effort: 1,
+    riceScore: 0,
     hypothesis: "",
     successCriteria: "",
     outOfScope: "",
@@ -43,6 +53,30 @@ export default function NewDecisionPage() {
   }, [currentStep]);
 
   if (!user) return null;
+
+  const calculateRICE = (reach: number, impact: number, confidence: number, effort: number) => {
+    if (effort === 0) return 0;
+    return Math.round((reach * impact * (confidence / 100)) / effort);
+  };
+
+  const getRICEPriority = (score: number): { level: string; color: string; description: string } => {
+    if (score >= 100) return { level: "🔥 Critical Priority", color: "text-error", description: "Do this first" };
+    if (score >= 50) return { level: "🚀 High Priority", color: "text-success", description: "Strong candidate" };
+    if (score >= 20) return { level: "💡 Medium Priority", color: "text-info", description: "Consider timing" };
+    return { level: "⏸️ Low Priority", color: "text-neutral-500", description: "Defer or drop" };
+  };
+
+  const handleRICEChange = (field: "reach" | "impact" | "confidence" | "effort", value: number) => {
+    const updated = { ...formData, [field]: value };
+    const score = calculateRICE(updated.reach, updated.impact, updated.confidence, updated.effort);
+    setFormData({ ...updated, riceScore: score });
+  };
+
+  const handleRICESubmit = () => {
+    if (formData.reach > 0 && formData.effort > 0) {
+      setCurrentStep("hypothesis");
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +102,7 @@ export default function NewDecisionPage() {
 
       case "title":
         setFormData({ ...formData, title: value });
-        setCurrentStep("hypothesis");
+        setCurrentStep("rice");
         break;
 
       case "hypothesis":
@@ -92,18 +126,30 @@ export default function NewDecisionPage() {
     const templates = {
       ab_test: {
         title: "A/B test new checkout flow",
+        reach: 5000,
+        impact: 2,
+        confidence: 70,
+        effort: 1.5,
         hypothesis: "Simplifying checkout from 5 steps to 3 will increase conversion by 15%",
         successCriteria: "- Checkout conversion ≥ 45% (baseline: 30%)\n- Cart abandonment < 20%\n- No increase in support tickets",
         outOfScope: "- Payment method changes (separate experiment)\n- Mobile app (web only)",
       },
       feature: {
         title: "Add dark mode toggle",
+        reach: 3000,
+        impact: 1,
+        confidence: 90,
+        effort: 0.5,
         hypothesis: "Users prefer dark mode for extended sessions, especially night usage",
         successCriteria: "- 40%+ adoption within 2 weeks\n- Session duration increases 10%+\n- User feedback score ≥ 4.5/5",
         outOfScope: "- Custom theme colors (Phase 2)\n- Automatic time-based switching",
       },
       perf: {
         title: "Optimize API response time",
+        reach: 8000,
+        impact: 1,
+        confidence: 80,
+        effort: 2,
         hypothesis: "Reducing API latency below 200ms will improve user satisfaction scores",
         successCriteria: "- P95 latency < 200ms (current: 450ms)\n- User satisfaction score +0.5 points\n- No increase in error rate",
         outOfScope: "- Database migration (too risky)\n- Caching infrastructure changes",
@@ -111,9 +157,15 @@ export default function NewDecisionPage() {
     };
 
     const selected = templates[template];
+    const riceScore = calculateRICE(selected.reach, selected.impact, selected.confidence, selected.effort);
     setFormData({
       ...formData,
       title: selected.title,
+      reach: selected.reach,
+      impact: selected.impact,
+      confidence: selected.confidence,
+      effort: selected.effort,
+      riceScore,
       hypothesis: selected.hypothesis,
       successCriteria: selected.successCriteria,
       outOfScope: selected.outOfScope,
@@ -209,7 +261,131 @@ export default function NewDecisionPage() {
     {
       role: "user",
       content: formData.title,
-      visible: formData.title !== "" && currentStep !== "title",
+      visible: formData.title !== "" && currentStep !== "title" && currentStep !== "rice",
+    },
+    {
+      role: "assistant",
+      content: "Excellent! Before we dive into the hypothesis, let's prioritize this decision using the RICE framework.",
+      visible: currentStep === "rice" && formData.riceScore === 0,
+    },
+    {
+      role: "assistant",
+      content: (() => {
+        const priority = getRICEPriority(formData.riceScore);
+        return (
+          <div className="space-y-6">
+            {/* RICE Score Display */}
+            {formData.riceScore > 0 && (
+              <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-xl p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="text-sm font-semibold text-neutral-600 uppercase tracking-wide mb-1">
+                      RICE Score
+                    </div>
+                    <div className="text-5xl font-bold text-primary">{formData.riceScore}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-2xl font-bold ${priority.color}`}>{priority.level}</div>
+                    <div className="text-sm text-neutral-600">{priority.description}</div>
+                  </div>
+                </div>
+                <div className="text-xs text-neutral-500 mt-2">
+                  Formula: (Reach × Impact × Confidence) / Effort = ({formData.reach} × {formData.impact} × {formData.confidence}%) / {formData.effort}
+                </div>
+              </div>
+            )}
+
+            {/* RICE Inputs */}
+            <div className="bg-white border-2 border-neutral-200 rounded-xl p-6 space-y-4">
+              {/* Reach */}
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  Reach: How many users will this impact? (per quarter)
+                </label>
+                <input
+                  type="number"
+                  value={formData.reach || ""}
+                  onChange={(e) => handleRICEChange("reach", parseInt(e.target.value) || 0)}
+                  placeholder="e.g., 1000"
+                  className="w-full px-4 py-3 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <div className="text-xs text-neutral-500 mt-1">Number of people/events per time period</div>
+              </div>
+
+              {/* Impact */}
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  Impact: How much will it impact each user?
+                </label>
+                <select
+                  value={formData.impact}
+                  onChange={(e) => handleRICEChange("impact", parseFloat(e.target.value))}
+                  className="w-full px-4 py-3 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                >
+                  <option value={0.25}>0.25 - Minimal impact</option>
+                  <option value={0.5}>0.5 - Low impact</option>
+                  <option value={1}>1.0 - Medium impact</option>
+                  <option value={2}>2.0 - High impact</option>
+                  <option value={3}>3.0 - Massive impact</option>
+                </select>
+                <div className="text-xs text-neutral-500 mt-1">Per-person impact when feature is used</div>
+              </div>
+
+              {/* Confidence */}
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  Confidence: How sure are you? ({formData.confidence}%)
+                </label>
+                <div className="flex items-center gap-4">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="10"
+                    value={formData.confidence}
+                    onChange={(e) => handleRICEChange("confidence", parseInt(e.target.value))}
+                    className="flex-1"
+                  />
+                  <span className="text-2xl font-bold text-primary w-16 text-right">{formData.confidence}%</span>
+                </div>
+                <div className="text-xs text-neutral-500 mt-1">Based on research, data, and evidence</div>
+              </div>
+
+              {/* Effort */}
+              <div>
+                <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                  Effort: How much work is this? (person-months)
+                </label>
+                <input
+                  type="number"
+                  step="0.5"
+                  value={formData.effort || ""}
+                  onChange={(e) => handleRICEChange("effort", parseFloat(e.target.value) || 1)}
+                  placeholder="e.g., 2"
+                  className="w-full px-4 py-3 border-2 border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+                <div className="text-xs text-neutral-500 mt-1">Total team effort across product, design, engineering</div>
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            {formData.reach > 0 && formData.effort > 0 && (
+              <button
+                onClick={handleRICESubmit}
+                className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover-lift transition-smooth shadow-sm"
+              >
+                Continue to Hypothesis →
+              </button>
+            )}
+          </div>
+        );
+      })(),
+      visible: currentStep === "rice",
+    },
+    {
+      role: "user",
+      content: `RICE Score: ${formData.riceScore} (${getRICEPriority(formData.riceScore).level})`,
+      visible: formData.riceScore > 0 && currentStep !== "rice",
     },
     {
       role: "assistant",
@@ -273,6 +449,22 @@ export default function NewDecisionPage() {
       content: (
         <div className="space-y-4">
           <p className="font-semibold">Perfect! Here's your decision cycle:</p>
+
+          {/* RICE Score Summary */}
+          {formData.riceScore > 0 && (
+            <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold text-neutral-600 uppercase tracking-wide">RICE Priority</div>
+                  <div className="text-3xl font-bold text-primary">{formData.riceScore}</div>
+                </div>
+                <div className={`text-xl font-bold ${getRICEPriority(formData.riceScore).color}`}>
+                  {getRICEPriority(formData.riceScore).level}
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6 space-y-4">
             <div>
               <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Project</h3>
@@ -308,6 +500,11 @@ export default function NewDecisionPage() {
                 setFormData({
                   projectId: formData.projectId,
                   title: "",
+                  reach: 0,
+                  impact: 1,
+                  confidence: 80,
+                  effort: 1,
+                  riceScore: 0,
                   hypothesis: "",
                   successCriteria: "",
                   outOfScope: "",
