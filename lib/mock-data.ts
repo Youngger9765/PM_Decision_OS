@@ -1,5 +1,10 @@
 // Mock data for MVP demo
 
+// Type definitions (match Prisma schema)
+export type DecisionCycleStatus = "DRAFTING" | "EXECUTING" | "REVIEW" | "OUTCOME" | "CLOSED";
+export type ReviewVerdict = "VALIDATED" | "NOT_VALIDATED";
+export type OutcomeDecision = "PROCEED" | "ITERATE" | "STOP";
+
 export const mockProjects = [
   {
     id: "proj_1",
