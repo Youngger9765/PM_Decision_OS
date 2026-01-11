@@ -78,6 +78,63 @@ export default function NewDecisionPage() {
     }
   };
 
+  const parseSuccessCriteriaToOKR = (criteriaText: string): {
+    keyResults: Array<{
+      metric: string;
+      target: string;
+      baseline?: string;
+      achieved?: number;
+    }>;
+    summary: string;
+  } => {
+    const lines = criteriaText.split('\n').filter(line => line.trim().startsWith('-'));
+    const keyResults = lines.map(line => {
+      const cleaned = line.replace(/^-\s*/, '').trim();
+
+      // Extract metric name (before the operator or number)
+      let metric = cleaned;
+      let target = '';
+      let baseline = undefined;
+
+      // Look for comparison operators and extract target
+      const operators = ['≥', '>=', '≤', '<=', '>', '<', '='];
+      for (const op of operators) {
+        if (cleaned.includes(op)) {
+          const parts = cleaned.split(op);
+          metric = parts[0].trim();
+          target = op + ' ' + parts[1].split('(')[0].trim(); // Remove baseline part
+
+          // Extract baseline if present
+          const baselineMatch = cleaned.match(/\(.*?baseline.*?(\d+\.?\d*%?)\)/i);
+          if (baselineMatch) {
+            baseline = baselineMatch[1];
+          }
+          break;
+        }
+      }
+
+      // If no operator found, look for "increases", "reduces", "improves" patterns
+      if (!target) {
+        const increaseMatch = cleaned.match(/(increases?|improves?|grows?)\s+(?:by\s+)?(\d+\.?\d*%?)/i);
+        const decreaseMatch = cleaned.match(/(reduces?|decreases?|drops?)\s+(?:by\s+)?(\d+\.?\d*%?)/i);
+
+        if (increaseMatch) {
+          target = '+' + increaseMatch[2];
+        } else if (decreaseMatch) {
+          target = '-' + decreaseMatch[2];
+        }
+      }
+
+      return { metric, target, baseline, achieved: undefined };
+    });
+
+    const summary = keyResults.length > 0
+      ? `${keyResults.length} Key Results defined`
+      : 'No measurable criteria detected';
+
+    return { keyResults, summary };
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim()) return;
@@ -427,6 +484,54 @@ export default function NewDecisionPage() {
     },
     {
       role: "assistant",
+      content: (() => {
+        if (!formData.successCriteria) return null;
+        const okr = parseSuccessCriteriaToOKR(formData.successCriteria);
+
+        if (okr.keyResults.length === 0) return null;
+
+        return (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🎯</span>
+              <p className="font-semibold">I parsed your success criteria into {okr.keyResults.length} measurable Key Results:</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-success/10 to-info/10 border-2 border-success/30 rounded-xl p-4 space-y-3">
+              {okr.keyResults.map((kr, idx) => (
+                <div key={idx} className="flex items-start gap-3">
+                  <div className="w-6 h-6 bg-success/20 text-success rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold mt-0.5">
+                    {idx + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-neutral-900">{kr.metric}</div>
+                    <div className="flex items-center gap-3 mt-1">
+                      <div className="text-sm">
+                        <span className="text-neutral-500">Target:</span>{' '}
+                        <span className="font-semibold text-success">{kr.target}</span>
+                      </div>
+                      {kr.baseline && (
+                        <div className="text-sm">
+                          <span className="text-neutral-500">Baseline:</span>{' '}
+                          <span className="font-semibold text-neutral-700">{kr.baseline}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-xs text-neutral-500 italic">
+              💡 These Key Results will be used to auto-validate your hypothesis after the experiment.
+            </div>
+          </div>
+        );
+      })(),
+      visible: formData.successCriteria !== "" && currentStep !== "criteria",
+    },
+    {
+      role: "assistant",
       content: "Almost done! What's explicitly out of scope for this experiment?",
       visible: currentStep === "scope" && formData.outOfScope === "",
     },
@@ -479,8 +584,31 @@ export default function NewDecisionPage() {
               <p className="text-neutral-900">{formData.hypothesis}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Success Criteria</h3>
-              <pre className="whitespace-pre-wrap text-neutral-800 font-sans text-sm">{formData.successCriteria}</pre>
+              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Success Criteria (OKR)</h3>
+              {(() => {
+                const okr = parseSuccessCriteriaToOKR(formData.successCriteria);
+                if (okr.keyResults.length > 0) {
+                  return (
+                    <div className="space-y-2">
+                      {okr.keyResults.map((kr, idx) => (
+                        <div key={idx} className="flex items-start gap-2 text-sm">
+                          <span className="text-success font-bold">KR{idx + 1}:</span>
+                          <div>
+                            <span className="font-medium">{kr.metric}</span>
+                            <span className="text-neutral-600"> → </span>
+                            <span className="text-success font-semibold">{kr.target}</span>
+                            {kr.baseline && (
+                              <span className="text-neutral-500 text-xs ml-2">(baseline: {kr.baseline})</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                } else {
+                  return <pre className="whitespace-pre-wrap text-neutral-800 font-sans text-sm">{formData.successCriteria}</pre>;
+                }
+              })()}
             </div>
             <div>
               <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Out of Scope</h3>
