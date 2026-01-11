@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { mockProjects, mockCycles } from "@/lib/mock-data";
+import { mockProjects, mockCycles, calculateNorthStarMetrics } from "@/lib/mock-data";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -102,6 +102,110 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
+        {/* North Star Metric */}
+        <section className="mb-12">
+          {(() => {
+            const northStar = calculateNorthStarMetrics();
+            const trendColor = northStar.trend >= 0 ? "text-success" : "text-error";
+            const trendIcon = northStar.trend >= 0 ? "↑" : "↓";
+
+            return (
+              <div className="bg-gradient-to-br from-primary/5 via-accent/5 to-primary/5 border-2 border-primary/20 rounded-2xl p-8">
+                <div className="flex items-start justify-between mb-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="text-2xl">🎯</span>
+                      <h2 className="text-xl font-bold text-neutral-900">North Star Metric</h2>
+                    </div>
+                    <p className="text-sm text-neutral-600">
+                      The ONE metric that matters: decisions backed by data, not guesses
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Current Rate */}
+                  <div>
+                    <div className="mb-4">
+                      <div className="text-sm font-semibold text-neutral-600 uppercase tracking-wide mb-2">
+                        Validated Decision Rate
+                      </div>
+                      <div className="flex items-baseline gap-3">
+                        <span className="text-6xl font-bold text-primary">
+                          {northStar.validatedDecisionRate}%
+                        </span>
+                        <span className={`text-2xl font-bold ${trendColor}`}>
+                          {trendIcon} {Math.abs(northStar.trend)}%
+                        </span>
+                      </div>
+                      <div className="text-sm text-neutral-600 mt-2">
+                        {northStar.breakdown.validated} validated / {northStar.breakdown.total} total decisions
+                      </div>
+                    </div>
+
+                    {/* Breakdown */}
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="bg-white rounded-lg p-3 border border-neutral-200">
+                        <div className="text-2xl font-bold text-success">{northStar.breakdown.validated}</div>
+                        <div className="text-xs text-neutral-600">Validated</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-neutral-200">
+                        <div className="text-2xl font-bold text-error">{northStar.breakdown.notValidated}</div>
+                        <div className="text-xs text-neutral-600">Not Validated</div>
+                      </div>
+                      <div className="bg-white rounded-lg p-3 border border-neutral-200">
+                        <div className="text-2xl font-bold text-info">{northStar.breakdown.pending}</div>
+                        <div className="text-xs text-neutral-600">Pending</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trend Chart */}
+                  <div>
+                    <div className="text-sm font-semibold text-neutral-600 uppercase tracking-wide mb-4">
+                      Learning Curve (Last 4 Months)
+                    </div>
+                    <div className="bg-white rounded-lg p-4 border border-neutral-200">
+                      {/* Simple bar chart */}
+                      <div className="space-y-3">
+                        {northStar.history.map((item, idx) => (
+                          <div key={idx}>
+                            <div className="flex items-center justify-between text-xs mb-1">
+                              <span className="text-neutral-600 font-medium">{item.month}</span>
+                              <span className="text-neutral-900 font-bold">{item.rate}%</span>
+                            </div>
+                            <div className="w-full bg-neutral-100 rounded-full h-2">
+                              <div
+                                className="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all"
+                                style={{ width: `${item.rate}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="text-xs text-neutral-500 mt-3 italic">
+                      📈 Your team is learning: {northStar.history[0].rate}% → {northStar.validatedDecisionRate}%
+                    </div>
+                  </div>
+                </div>
+
+                {/* Why This Matters */}
+                <div className="mt-6 pt-6 border-t border-primary/20">
+                  <div className="flex items-start gap-3">
+                    <span className="text-lg">💡</span>
+                    <div className="text-sm text-neutral-700">
+                      <strong>Why this matters:</strong> High validation rate = decisions backed by evidence, not opinions.
+                      Low rate = learning opportunity (better hypotheses next time).
+                      <strong className="text-primary">GitHub Issues can't track this.</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+        </section>
+
         {/* Quick Stats */}
         <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6">

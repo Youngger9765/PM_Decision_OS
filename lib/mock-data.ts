@@ -176,3 +176,55 @@ export function getMockProject(id: string) {
 export function getMockCyclesForProject(projectId: string) {
   return mockCycles.filter(c => c.projectId === projectId);
 }
+
+// North Star Metric Calculation
+export interface NorthStarMetrics {
+  validatedDecisionRate: number;  // Current rate
+  trend: number;                  // Change vs last period
+  breakdown: {
+    validated: number;
+    notValidated: number;
+    pending: number;
+    total: number;
+  };
+  history: {
+    month: string;
+    rate: number;
+  }[];
+}
+
+export function calculateNorthStarMetrics(): NorthStarMetrics {
+  const closedCycles = mockCycles.filter(c => c.status === "CLOSED");
+  const validated = closedCycles.filter(c => c.review?.verdict === "VALIDATED").length;
+  const notValidated = closedCycles.filter(c => c.review?.verdict === "NOT_VALIDATED").length;
+  const pending = mockCycles.filter(c => c.status !== "CLOSED").length;
+  const total = mockCycles.length;
+
+  const currentRate = closedCycles.length > 0
+    ? Math.round((validated / closedCycles.length) * 100)
+    : 0;
+
+  // Mock historical data (showing improvement trend)
+  const history = [
+    { month: "Oct 2025", rate: 45 },
+    { month: "Nov 2025", rate: 58 },
+    { month: "Dec 2025", rate: 67 },
+    { month: "Jan 2026", rate: currentRate },
+  ];
+
+  // Calculate trend (vs previous month)
+  const previousRate = history[history.length - 2].rate;
+  const trend = currentRate - previousRate;
+
+  return {
+    validatedDecisionRate: currentRate,
+    trend,
+    breakdown: {
+      validated,
+      notValidated,
+      pending,
+      total,
+    },
+    history,
+  };
+}
