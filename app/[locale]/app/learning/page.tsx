@@ -2,21 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { mockLearningPatterns, getLearningInsights } from "@/lib/mock-data";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function LearningRepositoryPage() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('learning');
+  const tCommon = useTranslations('common');
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
     const mockUser = localStorage.getItem("mockUser");
     if (!mockUser) {
-      router.push("/auth/login");
+      router.push(`/${locale}/auth/login`);
     } else {
       setUser(JSON.parse(mockUser));
     }
-  }, [router]);
+  }, [router, locale]);
 
   if (!user) return null;
 
@@ -53,23 +58,24 @@ export default function LearningRepositoryPage() {
       <header className="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/app" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link href={`/${locale}/app`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg"></div>
-              <h1 className="text-xl font-bold">Decision OS</h1>
+              <h1 className="text-xl font-bold">{tCommon('appName')}</h1>
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/app" className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
-                Dashboard
+              <Link href={`/${locale}/app`} className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors">
+                {tCommon('dashboard')}
               </Link>
+              <LanguageSwitcher />
               <span className="text-sm text-neutral-600">{user.name}</span>
               <button
                 onClick={() => {
                   localStorage.removeItem("mockUser");
-                  router.push("/");
+                  router.push(`/${locale}`);
                 }}
                 className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors"
               >
-                Logout
+                {tCommon('logout')}
               </button>
             </div>
           </div>
@@ -82,10 +88,10 @@ export default function LearningRepositoryPage() {
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-3xl">🧠</span>
-            <h1 className="text-3xl font-bold">Learning Repository</h1>
+            <h1 className="text-3xl font-bold">{t('title')}</h1>
           </div>
           <p className="text-neutral-600">
-            Learn from past failures. Identify patterns. Stop repeating mistakes.
+            {t('description')}
           </p>
         </div>
 
@@ -96,15 +102,15 @@ export default function LearningRepositoryPage() {
               {/* Total Failures Learned From */}
               <div>
                 <div className="text-5xl font-bold text-primary mb-2">{insights.totalFailures}</div>
-                <div className="text-sm text-neutral-600 font-medium">Failures Analyzed</div>
-                <div className="text-xs text-neutral-500 mt-1">Turned into institutional knowledge</div>
+                <div className="text-sm text-neutral-600 font-medium">{t('stats.failuresAnalyzed')}</div>
+                <div className="text-xs text-neutral-500 mt-1">{t('stats.failuresAnalyzedSub')}</div>
               </div>
 
               {/* Patterns Identified */}
               <div>
                 <div className="text-5xl font-bold text-accent mb-2">{insights.patternsIdentified}</div>
-                <div className="text-sm text-neutral-600 font-medium">Patterns Identified</div>
-                <div className="text-xs text-neutral-500 mt-1">Common failure modes recognized</div>
+                <div className="text-sm text-neutral-600 font-medium">{t('stats.patternsIdentified')}</div>
+                <div className="text-xs text-neutral-500 mt-1">{t('stats.patternsIdentifiedSub')}</div>
               </div>
 
               {/* Improvement Rate */}
@@ -113,8 +119,8 @@ export default function LearningRepositoryPage() {
                   <span className="text-5xl font-bold text-success">{insights.improvementRate}%</span>
                   <span className="text-2xl text-success">↓</span>
                 </div>
-                <div className="text-sm text-neutral-600 font-medium">Improvement Rate</div>
-                <div className="text-xs text-neutral-500 mt-1">Fewer pattern repeats over 6 months</div>
+                <div className="text-sm text-neutral-600 font-medium">{t('stats.improvementRate')}</div>
+                <div className="text-xs text-neutral-500 mt-1">{t('stats.improvementRateSub')}</div>
               </div>
             </div>
 
@@ -123,9 +129,8 @@ export default function LearningRepositoryPage() {
               <div className="flex items-start gap-3">
                 <span className="text-lg">💡</span>
                 <div className="text-sm text-neutral-700">
-                  <strong>Why this matters:</strong> Most teams close failed projects and move on, losing valuable lessons.
-                  Decision OS captures WHY things failed so you don't repeat the same mistakes.
-                  <strong className="text-primary"> GitHub can't do this.</strong>
+                  <strong>{t('stats.whyMatters.title')}</strong> {t('stats.whyMatters.description')}
+                  <strong className="text-primary">{t('stats.whyMatters.githubCant')}</strong>
                 </div>
               </div>
             </div>
@@ -134,7 +139,7 @@ export default function LearningRepositoryPage() {
 
         {/* Failure Patterns */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Common Failure Patterns</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('patterns.title')}</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {mockLearningPatterns.map((pattern) => {
               const colors = getPatternColor(pattern.occurrences);
@@ -160,7 +165,7 @@ export default function LearningRepositoryPage() {
                   {/* Examples */}
                   <div className="mb-4">
                     <div className="text-xs font-semibold text-neutral-600 uppercase tracking-wide mb-2">
-                      Real Examples
+                      {t('patterns.realExamples')}
                     </div>
                     <div className="space-y-2">
                       {pattern.examples.map((example, idx) => (
@@ -169,7 +174,7 @@ export default function LearningRepositoryPage() {
                             "{example.cycleTitle}"
                           </div>
                           <div className="text-xs text-neutral-600 italic">
-                            Lesson: {example.lesson}
+                            {t('patterns.lesson')}: {example.lesson}
                           </div>
                         </div>
                       ))}
@@ -182,7 +187,7 @@ export default function LearningRepositoryPage() {
                       <span className="text-sm">💡</span>
                       <div>
                         <div className="text-xs font-semibold text-neutral-600 uppercase tracking-wide mb-1">
-                          Recommendation
+                          {t('patterns.recommendation')}
                         </div>
                         <div className="text-sm text-neutral-700">{pattern.recommendation}</div>
                       </div>
@@ -196,7 +201,7 @@ export default function LearningRepositoryPage() {
 
         {/* Top Lessons Learned */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold mb-6">Top Lessons Learned</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('lessons.title')}</h2>
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-8">
             <div className="space-y-4">
               {insights.topLessons.map((lesson, idx) => (
@@ -220,17 +225,17 @@ export default function LearningRepositoryPage() {
               <span className="text-4xl">{getPatternIcon(insights.mostCommonPattern.pattern)}</span>
               <div className="flex-1">
                 <h3 className="text-xl font-bold mb-2">
-                  Most Common Failure: {insights.mostCommonPattern.label}
+                  {t('mostCommon.title')}: {insights.mostCommonPattern.label}
                 </h3>
                 <p className="text-neutral-700 mb-4">{insights.mostCommonPattern.description}</p>
                 <div className="bg-white/50 rounded-lg p-4 border border-warning/20">
-                  <div className="text-sm font-semibold text-neutral-900 mb-2">What to do next time:</div>
+                  <div className="text-sm font-semibold text-neutral-900 mb-2">{t('mostCommon.whatToDoNext')}:</div>
                   <p className="text-sm text-neutral-700">{insights.mostCommonPattern.recommendation}</p>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-4xl font-bold text-error">{insights.mostCommonPattern.occurrences}</div>
-                <div className="text-xs text-neutral-600">occurrences</div>
+                <div className="text-xs text-neutral-600">{t('mostCommon.occurrences')}</div>
               </div>
             </div>
           </div>

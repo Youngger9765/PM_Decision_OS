@@ -1,0 +1,382 @@
+{
+  "common": {
+    "appName": "Decision OS",
+    "dashboard": "Dashboard",
+    "logout": "Logout",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "backToDashboard": "Back to Dashboard"
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "signIn": "Sign in"
+    },
+    "hero": {
+      "title": "Turn product decisions into actionable outcomes",
+      "subtitle": "Structured decision cycles with GitHub workflow integration",
+      "badge": "Stop guessing. Start deciding with confidence.",
+      "cta": {
+        "getStarted": "Get Started",
+        "viewGithub": "View on GitHub"
+      }
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Every decision cycle follows four structured phases",
+      "phases": {
+        "hypothesis": {
+          "title": "Hypothesis Definition",
+          "description": "Define testable hypothesis & success criteria"
+        },
+        "execution": {
+          "title": "Execution / Experiment",
+          "description": "Build, test, and collect evidence"
+        },
+        "review": {
+          "title": "Decision Review",
+          "description": "Validate or reject hypothesis based on evidence"
+        },
+        "outcome": {
+          "title": "Decision Outcome",
+          "description": "Decide next steps: proceed, iterate, or stop"
+        }
+      }
+    },
+    "github": {
+      "title": "GitHub Integration",
+      "description": "Auto-sync CI status, preview URLs, and deployment evidence",
+      "features": {
+        "workflow": "Workflow Trigger",
+        "evidence": "Evidence Collection",
+        "automation": "Automation"
+      }
+    },
+    "jtbd": {
+      "title": "Why Decision OS?",
+      "subtitle": "The gap between GitHub Issues and PM tools",
+      "headers": {
+        "task": "Job to be Done",
+        "github": "GitHub Issues",
+        "decisionOS": "Decision OS"
+      },
+      "tasks": {
+        "bugTracking": {
+          "title": "Track bugs and feature requests",
+          "description": "Developer workflow management",
+          "perfect": "Perfect for this",
+          "wrong": "Wrong tool"
+        },
+        "hypothesis": {
+          "title": "Define hypothesis before building",
+          "description": "Test assumptions before building",
+          "github": "No — just write specs",
+          "decisionOS": "Yes — forced hypothesis + success criteria"
+        },
+        "evidence": {
+          "title": "Collect evidence to validate ideas",
+          "description": "No manual screenshots or metrics",
+          "github": "No — manual screenshots/links",
+          "decisionOS": "Yes — auto-collect from CI/Preview"
+        },
+        "validate": {
+          "title": "Validate success against real data",
+          "description": "Did it work? Why or why not?",
+          "github": "No — feature merged = done",
+          "decisionOS": "Yes — forced review phase"
+        },
+        "learn": {
+          "title": "Learn from failures & avoid repeats",
+          "description": "Stop repeating the same mistakes",
+          "github": "No — close issue and forget",
+          "decisionOS": "Yes — Learning Repository tracks patterns"
+        }
+      }
+    },
+    "pricing": {
+      "title": "Pricing",
+      "starter": {
+        "name": "Starter",
+        "price": "$19",
+        "period": "/month",
+        "features": ["Up to 3 projects", "Unlimited cycles", "Basic GitHub integration"]
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$49",
+        "period": "/month",
+        "features": ["Unlimited projects", "Advanced analytics", "Learning Repository", "AI-assisted review"]
+      }
+    },
+    "footer": {
+      "builtFor": "Built for Product Managers",
+      "github": "GitHub"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login to Decision OS",
+      "subtitle": "Sign in to manage your product decisions",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "githubButton": "Continue with GitHub (Mock)",
+      "demoNotice": "This is a demo. Click to login without real GitHub OAuth.",
+      "backToHome": "← Back to home",
+      "errors": {
+        "invalidCredentials": "Invalid email or password",
+        "required": "This field is required"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "Decision Dashboard",
+    "northStar": {
+      "title": "North Star Metric",
+      "metric": "Validated Decision Rate",
+      "description": "Track how often your team validates hypotheses with data",
+      "validatedDecisionRate": "{rate}%",
+      "validatedOf": "{validated} of {total} validated",
+      "learningCurve": "Learning Curve",
+      "teamLearning": "{from}% → {to}% team learning rate",
+      "trend": "Trend",
+      "breakdown": {
+        "title": "Breakdown",
+        "validated": "Validated",
+        "notValidated": "Not Validated",
+        "pending": "Pending",
+        "total": "Total"
+      },
+      "chart": {
+        "title": "Historical Trend"
+      },
+      "whyMatters": {
+        "title": "Why this matters:",
+        "description": "Most teams build features without validating if they actually solve the problem. This metric tracks how often you actually validate hypotheses.",
+        "githubCant": "GitHub can't do this."
+      }
+    },
+    "stats": {
+      "activeProjects": "Active Projects",
+      "totalDecisions": "Total Decisions",
+      "completed": "Completed",
+      "inProgress": "In Progress"
+    },
+    "projects": {
+      "title": "Projects",
+      "newProject": "New Project",
+      "cycles": "cycles",
+      "columns": {
+        "project": "Project",
+        "cycles": "Cycles",
+        "github": "GitHub",
+        "updated": "Updated"
+      },
+      "connected": "Connected",
+      "notConnected": "Not Connected"
+    },
+    "cycles": {
+      "title": "Recent Decision Cycles",
+      "newCycle": "New Decision Cycle",
+      "viewAll": "View All",
+      "views": {
+        "cards": "Cards",
+        "list": "List"
+      },
+      "evidence": "Evidence",
+      "columns": {
+        "cycle": "Cycle",
+        "project": "Project",
+        "status": "Status",
+        "owner": "Owner",
+        "updated": "Updated"
+      },
+      "status": {
+        "DRAFTING": "Drafting",
+        "EXECUTING": "Executing",
+        "REVIEW": "Review",
+        "OUTCOME": "Outcome",
+        "CLOSED": "Closed"
+      }
+    }
+  },
+  "learning": {
+    "title": "Learning Repository",
+    "subtitle": "Learn from past failures. Identify patterns. Stop repeating mistakes.",
+    "stats": {
+      "failuresAnalyzed": "Failures Analyzed",
+      "failuresAnalyzedDesc": "Turned into institutional knowledge",
+      "patternsIdentified": "Patterns Identified",
+      "patternsIdentifiedDesc": "Common failure modes recognized",
+      "improvementRate": "Improvement Rate",
+      "improvementRateDesc": "Fewer pattern repeats over 6 months",
+      "whyMatters": "Why this matters",
+      "whyMattersDesc": "Most teams close failed projects and move on, losing valuable lessons. Decision OS captures WHY things failed so you don't repeat the same mistakes.",
+      "githubCant": "GitHub can't do this."
+    },
+    "patterns": {
+      "title": "Common Failure Patterns",
+      "realExamples": "Real Examples",
+      "lesson": "Lesson",
+      "recommendation": "Recommendation",
+      "occurrences": "x",
+      "types": {
+        "HYPOTHESIS_TOO_OPTIMISTIC": {
+          "label": "Overly Optimistic Hypotheses",
+          "description": "Setting unrealistic success criteria that couldn't be achieved"
+        },
+        "UNDERESTIMATED_EFFORT": {
+          "label": "Underestimated Engineering Effort",
+          "description": "Scope was larger than anticipated, causing missed deadlines"
+        },
+        "WRONG_SUCCESS_METRIC": {
+          "label": "Measuring the Wrong Thing",
+          "description": "Optimized for metrics that didn't reflect actual user value"
+        },
+        "IGNORED_USER_FEEDBACK": {
+          "label": "Ignored Early User Signals",
+          "description": "Proceeded despite negative user feedback during beta"
+        }
+      }
+    },
+    "lessons": {
+      "title": "Top Lessons Learned"
+    },
+    "mostCommon": {
+      "title": "Most Common Failure",
+      "whatToDoNext": "What to do next time",
+      "occurrences": "occurrences"
+    }
+  },
+  "cycle": {
+    "backToDashboard": "← Back to Dashboard",
+    "status": {
+      "DRAFTING": "Drafting",
+      "EXECUTING": "Executing",
+      "REVIEW": "Review",
+      "OUTCOME": "Outcome",
+      "CLOSED": "Closed"
+    },
+    "project": "Project",
+    "owner": "Owner",
+    "updated": "Updated",
+    "hypothesis": {
+      "title": "Hypothesis Definition",
+      "locked": "Locked",
+      "hypothesis": "HYPOTHESIS",
+      "successCriteria": "SUCCESS CRITERIA",
+      "outOfScope": "OUT OF SCOPE",
+      "edit": "Edit Hypothesis",
+      "lock": "Lock Hypothesis"
+    },
+    "execution": {
+      "title": "Execution & Evidence",
+      "evidenceCollected": "{count} evidence collected",
+      "types": {
+        "CI_RUN": "CI RUN",
+        "PREVIEW_URL": "PREVIEW URL"
+      },
+      "status": {
+        "completed": "completed",
+        "success": "success",
+        "in_progress": "in progress"
+      }
+    },
+    "review": {
+      "title": "Decision Review",
+      "verdict": "VERDICT",
+      "analysis": "ANALYSIS",
+      "keyResults": "Key Results",
+      "metric": "Metric",
+      "target": "Target",
+      "actual": "Actual",
+      "achieved": "Achieved",
+      "overallAchievement": "Overall Achievement",
+      "verdictOptions": {
+        "VALIDATED": "VALIDATED",
+        "NOT_VALIDATED": "NOT VALIDATED",
+        "selectVerdict": "Select verdict"
+      },
+      "achievedOptions": {
+        "select": "Select achievement",
+        "0": "0% - Miss",
+        "50": "50% - Partial",
+        "100": "100% - Achieved"
+      },
+      "placeholder": {
+        "noKR": "Explain your verdict based on the evidence collected...",
+        "withKR": "Based on {rate}% achievement rate, explain your verdict..."
+      },
+      "submit": "Submit Review",
+      "reviewed": "Reviewed"
+    },
+    "outcome": {
+      "title": "Decision Outcome",
+      "decision": "DECISION",
+      "notes": "NOTES",
+      "relatedIssue": "RELATED ISSUE",
+      "decisionOptions": {
+        "PROCEED": "PROCEED",
+        "ITERATE": "ITERATE",
+        "STOP": "STOP",
+        "selectDecision": "Select decision"
+      },
+      "placeholder": {
+        "notes": "Document your decision and next steps...",
+        "issueUrl": "GitHub Issue URL (optional)"
+      },
+      "submit": "Complete Cycle",
+      "decided": "Decided"
+    },
+    "agent": {
+      "title": "AI Review Assistant",
+      "analyzing": "Analyzing evidence...",
+      "keyResultsExtracted": "Key Results Extracted",
+      "suggestedVerdict": "Suggested Verdict",
+      "confidence": "Confidence",
+      "draftAnalysis": "Draft Analysis",
+      "expand": "Expand ▼",
+      "collapse": "Collapse ▲",
+      "riskWarnings": "Risk Warnings",
+      "riskLevels": {
+        "high": "HIGH",
+        "medium": "MEDIUM",
+        "low": "LOW"
+      },
+      "mitigation": "Mitigation",
+      "nextExperiment": "Suggested Next Experiment",
+      "hypothesis": "Hypothesis",
+      "expectedImpact": "Expected Impact",
+      "buttons": {
+        "autoFillKRs": "Auto-fill All KRs",
+        "useDraftAnalysis": "Use Draft Analysis"
+      },
+      "success": {
+        "krsFilled": "✓ All Key Results filled!",
+        "analysisInserted": "✓ Draft analysis inserted!"
+      }
+    }
+  },
+  "newCycle": {
+    "title": "New Decision Cycle",
+    "form": {
+      "project": "Project",
+      "selectProject": "Select project",
+      "cycleTitle": "Cycle Title",
+      "cycleTitlePlaceholder": "e.g., Test new onboarding flow",
+      "hypothesis": "Hypothesis",
+      "hypothesisPlaceholder": "I believe [change] will result in [outcome] because [reason]",
+      "successCriteria": "Success Criteria",
+      "successCriteriaPlaceholder": "- Metric A increases by X%\n- Metric B reaches Y\n- User satisfaction > Z",
+      "outOfScope": "Out of Scope",
+      "outOfScopePlaceholder": "What's not included in this cycle...",
+      "create": "Create Cycle",
+      "cancel": "Cancel"
+    }
+  }
+}

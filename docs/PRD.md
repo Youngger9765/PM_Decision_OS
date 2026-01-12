@@ -1,6 +1,6 @@
 # PRD: Decision OS - Product Decision Management System
 
-**Date**: 2026-01-11 | **Status**: Planning → Implementation
+**Date**: 2026-01-11 | **Last Updated**: 2026-01-12 | **Status**: Planning → Implementation
 
 ---
 
@@ -522,6 +522,95 @@ enum SubscriptionPlan {
 
 ## UI/UX Requirements
 
+### Internationalization (i18n)
+
+**Status**: ✅ Implemented (2026-01-12)
+
+#### Overview
+Decision OS supports full bilingual functionality with Traditional Chinese (zh-TW) as the default locale and English (en) as an alternative.
+
+#### Implementation Details
+- **Library**: next-intl v4.7.0 (optimized for Next.js 14 App Router)
+- **Routing Strategy**: Locale-aware URLs with `[locale]` dynamic segments
+  - Traditional Chinese: `/zh-TW/...`
+  - English: `/en/...`
+  - Root URL automatically redirects to default locale `/zh-TW`
+- **Locale Switching**: LanguageSwitcher component available in all page headers
+- **Translation Coverage**: 300+ translation keys covering all UI text
+
+#### Supported Pages (All Translated)
+- [x] Landing page (`/[locale]/page.tsx`)
+- [x] Auth login page (`/[locale]/auth/login/page.tsx`)
+- [x] Dashboard (`/[locale]/app/page.tsx`)
+- [x] Learning Repository (`/[locale]/app/learning/page.tsx`)
+- [x] New Cycle form (`/[locale]/app/cycles/new/page.tsx`)
+- [x] Cycle detail page (`/[locale]/app/cycles/[id]/page.tsx`)
+
+#### Translation Key Structure
+```typescript
+{
+  common: {
+    appName, dashboard, logout, loading, save, cancel, delete, edit, back
+  },
+  landing: {
+    hero: { title, subtitle, cta },
+    howItWorks: { title, subtitle, phases },
+    github: { title, description, features },
+    jtbd: { title, subtitle, tasks },
+    pricing: { title, starter, pro },
+    footer: { builtFor, github }
+  },
+  auth: {
+    login: { title, email, password, submit, errors }
+  },
+  dashboard: {
+    title, northStar, projects, cycles
+  },
+  learning: {
+    title, subtitle, stats, patterns, lessons
+  },
+  cycle: {
+    backToDashboard, status, project, owner, updated,
+    hypothesis, execution, review, outcome, agent
+  },
+  newCycle: {
+    title, form: { project, cycleTitle, hypothesis, successCriteria, outOfScope }
+  }
+}
+```
+
+#### Technical Configuration
+**i18n.ts**:
+```typescript
+export const locales = ['en', 'zh-TW'] as const;
+export const defaultLocale = 'zh-TW' as const;
+
+export default getRequestConfig(async ({ locale }) => {
+  const validLocale = locales.includes(locale as any) ? locale : defaultLocale;
+  return {
+    locale: validLocale,
+    messages: (await import(`./messages/${validLocale}.json`)).default
+  };
+});
+```
+
+**Middleware** (`middleware.ts`):
+- Automatic locale detection based on Accept-Language header
+- Explicit locale prefix mode (`localePrefix: 'always'`)
+- Cookie-based locale persistence (`NEXT_LOCALE`)
+
+#### Adding New Translations
+1. Add translation key to `messages/zh-TW.json` and `messages/en.json`
+2. Use in component: `const t = useTranslations('section'); t('key')`
+3. Update navigation links to include locale: `/${locale}/path`
+
+#### Future Locales (Out of Scope for V0)
+- Japanese (ja)
+- Korean (ko)
+- Simplified Chinese (zh-CN)
+
+---
+
 ### Page Specifications
 
 #### 1. Dashboard (`/app`)
@@ -927,7 +1016,18 @@ jobs:
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2026-01-11
-**Status**: Ready for Implementation
-**Next Step**: Route to agent-manager for execution
+**Document Version**: 1.1
+**Last Updated**: 2026-01-12
+**Status**: In Implementation - i18n Completed ✅
+**Next Step**: Continue with core features (GitHub integration, Decision Cycle management)
+
+---
+
+## Recent Updates
+
+### 2026-01-12: Internationalization (i18n) Implementation ✅
+- Implemented full bilingual support (Traditional Chinese, English)
+- 300+ translation keys across all 6 pages
+- Locale-aware routing with next-intl v4.7.0
+- Language switcher component
+- All pages fully translated and tested

@@ -1,0 +1,382 @@
+{
+  "common": {
+    "appName": "Decision OS",
+    "dashboard": "儀表板",
+    "logout": "登出",
+    "loading": "載入中...",
+    "save": "儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "edit": "編輯",
+    "back": "返回",
+    "backToDashboard": "返回儀表板"
+  },
+  "landing": {
+    "nav": {
+      "howItWorks": "運作方式",
+      "pricing": "定價",
+      "signIn": "登入"
+    },
+    "hero": {
+      "title": "將產品決策轉化為可執行成果",
+      "subtitle": "結構化決策循環與 GitHub 工作流程整合",
+      "badge": "停止猜測。開始有信心地決策。",
+      "cta": {
+        "getStarted": "開始使用",
+        "viewGithub": "在 GitHub 上查看"
+      }
+    },
+    "howItWorks": {
+      "title": "運作方式",
+      "subtitle": "每個決策循環都遵循四個結構化階段",
+      "phases": {
+        "hypothesis": {
+          "title": "假設定義",
+          "description": "定義可測試的假設與成功標準"
+        },
+        "execution": {
+          "title": "執行 / 實驗",
+          "description": "建立、測試並收集證據"
+        },
+        "review": {
+          "title": "決策審查",
+          "description": "根據證據驗證或駁回假設"
+        },
+        "outcome": {
+          "title": "決策結果",
+          "description": "決定下一步：繼續、迭代或停止"
+        }
+      }
+    },
+    "github": {
+      "title": "GitHub 整合",
+      "description": "自動同步 CI 狀態、預覽網址和部署證據",
+      "features": {
+        "workflow": "工作流程觸發器",
+        "evidence": "證據收集",
+        "automation": "自動化"
+      }
+    },
+    "jtbd": {
+      "title": "為什麼選擇 Decision OS？",
+      "subtitle": "GitHub Issues 和 PM 工具之間的差距",
+      "headers": {
+        "task": "需要完成的工作",
+        "github": "GitHub Issues",
+        "decisionOS": "Decision OS"
+      },
+      "tasks": {
+        "bugTracking": {
+          "title": "追蹤錯誤和功能請求",
+          "description": "開發者工作流程管理",
+          "perfect": "最適合",
+          "wrong": "錯誤工具"
+        },
+        "hypothesis": {
+          "title": "在建立功能前定義假設",
+          "description": "建立前測試假設",
+          "github": "否 — 直接寫規格",
+          "decisionOS": "是 — 強制假設 + 成功標準"
+        },
+        "evidence": {
+          "title": "收集證據以驗證想法",
+          "description": "無需手動截圖或指標",
+          "github": "否 — 手動附加截圖/連結",
+          "decisionOS": "是 — 自動從 CI/Preview 收集"
+        },
+        "validate": {
+          "title": "根據真實數據驗證成功",
+          "description": "有效嗎？為什麼或為什麼不？",
+          "github": "否 — 功能合併 = 完成",
+          "decisionOS": "是 — 強制審查階段"
+        },
+        "learn": {
+          "title": "從失敗中學習並避免重複",
+          "description": "停止重複同樣的錯誤",
+          "github": "否 — 關閉 Issue 後就忘記了",
+          "decisionOS": "是 — 學習庫追蹤模式"
+        }
+      }
+    },
+    "pricing": {
+      "title": "定價",
+      "starter": {
+        "name": "入門版",
+        "price": "$19",
+        "period": "/月",
+        "features": ["最多 3 個專案", "無限決策循環", "基本 GitHub 整合"]
+      },
+      "pro": {
+        "name": "專業版",
+        "price": "$49",
+        "period": "/月",
+        "features": ["無限專案", "進階分析", "學習庫", "AI 輔助審查"]
+      }
+    },
+    "footer": {
+      "builtFor": "為產品經理打造",
+      "github": "GitHub"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "登入 Decision OS",
+      "subtitle": "登入以管理您的產品決策",
+      "email": "電子郵件",
+      "password": "密碼",
+      "submit": "登入",
+      "githubButton": "使用 GitHub 繼續（模擬）",
+      "demoNotice": "這是一個演示。點擊登入，無需真實的 GitHub OAuth。",
+      "backToHome": "← 返回首頁",
+      "errors": {
+        "invalidCredentials": "電子郵件或密碼無效",
+        "required": "此欄位為必填"
+      }
+    }
+  },
+  "dashboard": {
+    "title": "決策儀表板",
+    "northStar": {
+      "title": "北極星指標",
+      "metric": "已驗證決策比率",
+      "description": "追蹤團隊用數據驗證假設的頻率",
+      "validatedDecisionRate": "{rate}%",
+      "validatedOf": "{validated} / {total} 已驗證",
+      "learningCurve": "學習曲線",
+      "teamLearning": "{from}% → {to}% 團隊學習率",
+      "trend": "趨勢",
+      "breakdown": {
+        "title": "明細",
+        "validated": "已驗證",
+        "notValidated": "未驗證",
+        "pending": "待處理",
+        "total": "總計"
+      },
+      "chart": {
+        "title": "歷史趨勢"
+      },
+      "whyMatters": {
+        "title": "為什麼這很重要：",
+        "description": "大多數團隊建立功能時沒有驗證它們是否真正解決了問題。此指標追蹤您實際驗證假設的頻率。",
+        "githubCant": "GitHub 做不到這點。"
+      }
+    },
+    "stats": {
+      "activeProjects": "活躍專案",
+      "totalDecisions": "總決策數",
+      "completed": "已完成",
+      "inProgress": "進行中"
+    },
+    "projects": {
+      "title": "專案",
+      "newProject": "新增專案",
+      "cycles": "個循環",
+      "columns": {
+        "project": "專案",
+        "cycles": "循環",
+        "github": "GitHub",
+        "updated": "更新時間"
+      },
+      "connected": "已連接",
+      "notConnected": "未連接"
+    },
+    "cycles": {
+      "title": "最近的決策循環",
+      "newCycle": "新增決策循環",
+      "viewAll": "查看全部",
+      "views": {
+        "cards": "卡片",
+        "list": "列表"
+      },
+      "evidence": "證據",
+      "columns": {
+        "cycle": "循環",
+        "project": "專案",
+        "status": "狀態",
+        "owner": "負責人",
+        "updated": "更新時間"
+      },
+      "status": {
+        "DRAFTING": "草稿中",
+        "EXECUTING": "執行中",
+        "REVIEW": "審查中",
+        "OUTCOME": "結果",
+        "CLOSED": "已關閉"
+      }
+    }
+  },
+  "learning": {
+    "title": "學習庫",
+    "subtitle": "從過去的失敗中學習。識別模式。停止重複錯誤。",
+    "stats": {
+      "failuresAnalyzed": "已分析的失敗",
+      "failuresAnalyzedDesc": "轉化為組織知識",
+      "patternsIdentified": "已識別的模式",
+      "patternsIdentifiedDesc": "已識別的常見失敗模式",
+      "improvementRate": "改善率",
+      "improvementRateDesc": "6 個月內減少重複模式",
+      "whyMatters": "為什麼這很重要",
+      "whyMattersDesc": "大多數團隊關閉失敗的專案後就繼續前進，失去寶貴的經驗教訓。Decision OS 捕捉失敗的原因，這樣您就不會重複同樣的錯誤。",
+      "githubCant": "GitHub 無法做到這一點。"
+    },
+    "patterns": {
+      "title": "常見失敗模式",
+      "realExamples": "真實範例",
+      "lesson": "教訓",
+      "recommendation": "建議",
+      "occurrences": "次",
+      "types": {
+        "HYPOTHESIS_TOO_OPTIMISTIC": {
+          "label": "過度樂觀的假設",
+          "description": "設定無法實現的不切實際成功標準"
+        },
+        "UNDERESTIMATED_EFFORT": {
+          "label": "低估工程工作量",
+          "description": "範圍比預期大，導致錯過截止日期"
+        },
+        "WRONG_SUCCESS_METRIC": {
+          "label": "衡量錯誤的指標",
+          "description": "優化的指標無法反映實際用戶價值"
+        },
+        "IGNORED_USER_FEEDBACK": {
+          "label": "忽視早期用戶信號",
+          "description": "儘管在測試期間有負面用戶反饋仍然繼續"
+        }
+      }
+    },
+    "lessons": {
+      "title": "最重要的經驗教訓"
+    },
+    "mostCommon": {
+      "title": "最常見的失敗",
+      "whatToDoNext": "下次該怎麼做",
+      "occurrences": "次發生"
+    }
+  },
+  "cycle": {
+    "backToDashboard": "← 返回儀表板",
+    "status": {
+      "DRAFTING": "草稿中",
+      "EXECUTING": "執行中",
+      "REVIEW": "審查中",
+      "OUTCOME": "結果",
+      "CLOSED": "已關閉"
+    },
+    "project": "專案",
+    "owner": "負責人",
+    "updated": "更新時間",
+    "hypothesis": {
+      "title": "假設定義",
+      "locked": "已鎖定",
+      "hypothesis": "假設",
+      "successCriteria": "成功標準",
+      "outOfScope": "範圍外",
+      "edit": "編輯假設",
+      "lock": "鎖定假設"
+    },
+    "execution": {
+      "title": "執行與證據",
+      "evidenceCollected": "已收集 {count} 項證據",
+      "types": {
+        "CI_RUN": "CI 執行",
+        "PREVIEW_URL": "預覽網址"
+      },
+      "status": {
+        "completed": "完成",
+        "success": "成功",
+        "in_progress": "進行中"
+      }
+    },
+    "review": {
+      "title": "決策審查",
+      "verdict": "判定",
+      "analysis": "分析",
+      "keyResults": "關鍵結果",
+      "metric": "指標",
+      "target": "目標",
+      "actual": "實際",
+      "achieved": "達成率",
+      "overallAchievement": "整體達成率",
+      "verdictOptions": {
+        "VALIDATED": "已驗證",
+        "NOT_VALIDATED": "未驗證",
+        "selectVerdict": "選擇判定"
+      },
+      "achievedOptions": {
+        "select": "選擇達成率",
+        "0": "0% - 未達成",
+        "50": "50% - 部分達成",
+        "100": "100% - 達成"
+      },
+      "placeholder": {
+        "noKR": "根據收集的證據解釋您的判定...",
+        "withKR": "根據 {rate}% 的達成率，解釋您的判定..."
+      },
+      "submit": "提交審查",
+      "reviewed": "已審查"
+    },
+    "outcome": {
+      "title": "決策結果",
+      "decision": "決定",
+      "notes": "註記",
+      "relatedIssue": "相關 Issue",
+      "decisionOptions": {
+        "PROCEED": "繼續",
+        "ITERATE": "迭代",
+        "STOP": "停止",
+        "selectDecision": "選擇決定"
+      },
+      "placeholder": {
+        "notes": "記錄您的決定並說明下一步...",
+        "issueUrl": "GitHub Issue URL (選填)"
+      },
+      "submit": "完成循環",
+      "decided": "已決定"
+    },
+    "agent": {
+      "title": "AI 審查助手",
+      "analyzing": "分析證據中...",
+      "keyResultsExtracted": "已提取關鍵結果",
+      "suggestedVerdict": "建議判定",
+      "confidence": "信心度",
+      "draftAnalysis": "草稿分析",
+      "expand": "展開 ▼",
+      "collapse": "收起 ▲",
+      "riskWarnings": "風險警告",
+      "riskLevels": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      },
+      "mitigation": "緩解措施",
+      "nextExperiment": "建議的下一個實驗",
+      "hypothesis": "假設",
+      "expectedImpact": "預期影響",
+      "buttons": {
+        "autoFillKRs": "自動填入所有關鍵結果",
+        "useDraftAnalysis": "使用草稿分析"
+      },
+      "success": {
+        "krsFilled": "✓ 所有關鍵結果已填入！",
+        "analysisInserted": "✓ 草稿分析已插入！"
+      }
+    }
+  },
+  "newCycle": {
+    "title": "新增決策循環",
+    "form": {
+      "project": "專案",
+      "selectProject": "選擇專案",
+      "cycleTitle": "循環標題",
+      "cycleTitlePlaceholder": "例如：測試新的入門流程",
+      "hypothesis": "假設",
+      "hypothesisPlaceholder": "我相信 [改變] 會導致 [結果]，因為 [原因]",
+      "successCriteria": "成功標準",
+      "successCriteriaPlaceholder": "- 指標 A 增加 X%\n- 指標 B 達到 Y\n- 用戶滿意度 > Z",
+      "outOfScope": "範圍外",
+      "outOfScopePlaceholder": "此循環中不包含的內容...",
+      "create": "建立循環",
+      "cancel": "取消"
+    }
+  }
+}

@@ -5,6 +5,43 @@ export type DecisionCycleStatus = "DRAFTING" | "EXECUTING" | "REVIEW" | "OUTCOME
 export type ReviewVerdict = "VALIDATED" | "NOT_VALIDATED";
 export type OutcomeDecision = "PROCEED" | "ITERATE" | "STOP";
 
+export interface MockCycle {
+  id: string;
+  title: string;
+  projectId: string;
+  projectName: string;
+  status: DecisionCycleStatus;
+  ownerUserId: string;
+  ownerName: string;
+  createdAt: Date;
+  updatedAt: Date;
+  hypothesis: {
+    hypothesis: string;
+    successCriteria: string;
+    outOfScope: string;
+    lockedAt: Date | null;
+  };
+  evidence: Array<{
+    id: string;
+    type: string;
+    referenceUrl: string;
+    status?: string;
+    conclusion?: string | null;
+    createdAt: Date;
+  }>;
+  review: {
+    verdict: ReviewVerdict;
+    comment: string;
+    createdAt: Date;
+  } | null;
+  outcome: {
+    outcome: OutcomeDecision;
+    notes: string;
+    githubIssueUrl?: string;
+    createdAt: Date;
+  } | null;
+}
+
 export const mockProjects = [
   {
     id: "proj_1",
@@ -40,7 +77,7 @@ export const mockProjects = [
   }
 ];
 
-export const mockCycles = [
+export const mockCycles: MockCycle[] = [
   {
     id: "cycle_1",
     title: "Test new onboarding flow with simplified signup",
@@ -165,7 +202,7 @@ export const mockCycles = [
   }
 ];
 
-export function getMockCycle(id: string) {
+export function getMockCycle(id: string): MockCycle | undefined {
   return mockCycles.find(c => c.id === id);
 }
 

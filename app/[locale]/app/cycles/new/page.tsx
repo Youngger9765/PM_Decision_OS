@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { mockProjects } from "@/lib/mock-data";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type Step = "project" | "title" | "rice" | "hypothesis" | "criteria" | "scope" | "confirm";
 
@@ -22,6 +24,10 @@ interface FormData {
 
 export default function NewDecisionPage() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('newCycle');
+  const tCommon = useTranslations('common');
+
   const [user, setUser] = useState<any>(null);
   const [currentStep, setCurrentStep] = useState<Step>("project");
   const [formData, setFormData] = useState<FormData>({
@@ -42,11 +48,11 @@ export default function NewDecisionPage() {
   useEffect(() => {
     const mockUser = localStorage.getItem("mockUser");
     if (!mockUser) {
-      router.push("/auth/login");
+      router.push(`/${locale}/auth/login`);
     } else {
       setUser(JSON.parse(mockUser));
     }
-  }, [router]);
+  }, [router, locale]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -91,20 +97,17 @@ export default function NewDecisionPage() {
     const keyResults = lines.map(line => {
       const cleaned = line.replace(/^-\s*/, '').trim();
 
-      // Extract metric name (before the operator or number)
       let metric = cleaned;
       let target = '';
       let baseline = undefined;
 
-      // Look for comparison operators and extract target
       const operators = ['≥', '>=', '≤', '<=', '>', '<', '='];
       for (const op of operators) {
         if (cleaned.includes(op)) {
           const parts = cleaned.split(op);
           metric = parts[0].trim();
-          target = op + ' ' + parts[1].split('(')[0].trim(); // Remove baseline part
+          target = op + ' ' + parts[1].split('(')[0].trim();
 
-          // Extract baseline if present
           const baselineMatch = cleaned.match(/\(.*?baseline.*?(\d+\.?\d*%?)\)/i);
           if (baselineMatch) {
             baseline = baselineMatch[1];
@@ -113,7 +116,6 @@ export default function NewDecisionPage() {
         }
       }
 
-      // If no operator found, look for "increases", "reduces", "improves" patterns
       if (!target) {
         const increaseMatch = cleaned.match(/(increases?|improves?|grows?)\s+(?:by\s+)?(\d+\.?\d*%?)/i);
         const decreaseMatch = cleaned.match(/(reduces?|decreases?|drops?)\s+(?:by\s+)?(\d+\.?\d*%?)/i);
@@ -144,7 +146,6 @@ export default function NewDecisionPage() {
 
     switch (currentStep) {
       case "project":
-        // Handle project selection (user can type project name or number)
         const projectIndex = parseInt(value) - 1;
         const selectedProject =
           projectIndex >= 0 && projectIndex < mockProjects.length
@@ -231,9 +232,7 @@ export default function NewDecisionPage() {
   };
 
   const handleCreateDecision = () => {
-    // In real app: POST to API
-    console.log("Creating decision:", formData);
-    router.push("/app");
+    router.push(`/${locale}/app`);
   };
 
   const selectedProject = mockProjects.find((p) => p.id === formData.projectId);
@@ -331,7 +330,6 @@ export default function NewDecisionPage() {
         const priority = getRICEPriority(formData.riceScore);
         return (
           <div className="space-y-6">
-            {/* RICE Score Display */}
             {formData.riceScore > 0 && (
               <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-2">
@@ -352,9 +350,7 @@ export default function NewDecisionPage() {
               </div>
             )}
 
-            {/* RICE Inputs */}
             <div className="bg-white border-2 border-neutral-200 rounded-xl p-6 space-y-4">
-              {/* Reach */}
               <div>
                 <label className="block text-sm font-semibold text-neutral-700 mb-2">
                   Reach: How many users will this impact? (per quarter)
@@ -369,7 +365,6 @@ export default function NewDecisionPage() {
                 <div className="text-xs text-neutral-500 mt-1">Number of people/events per time period</div>
               </div>
 
-              {/* Impact */}
               <div>
                 <label className="block text-sm font-semibold text-neutral-700 mb-2">
                   Impact: How much will it impact each user?
@@ -388,7 +383,6 @@ export default function NewDecisionPage() {
                 <div className="text-xs text-neutral-500 mt-1">Per-person impact when feature is used</div>
               </div>
 
-              {/* Confidence */}
               <div>
                 <label className="block text-sm font-semibold text-neutral-700 mb-2">
                   Confidence: How sure are you? ({formData.confidence}%)
@@ -408,7 +402,6 @@ export default function NewDecisionPage() {
                 <div className="text-xs text-neutral-500 mt-1">Based on research, data, and evidence</div>
               </div>
 
-              {/* Effort */}
               <div>
                 <label className="block text-sm font-semibold text-neutral-700 mb-2">
                   Effort: How much work is this? (person-months)
@@ -425,7 +418,6 @@ export default function NewDecisionPage() {
               </div>
             </div>
 
-            {/* Continue Button */}
             {formData.reach > 0 && formData.effort > 0 && (
               <button
                 onClick={handleRICESubmit}
@@ -555,7 +547,6 @@ export default function NewDecisionPage() {
         <div className="space-y-4">
           <p className="font-semibold">Perfect! Here's your decision cycle:</p>
 
-          {/* RICE Score Summary */}
           {formData.riceScore > 0 && (
             <div className="bg-gradient-to-br from-primary/10 to-accent/10 border-2 border-primary/30 rounded-xl p-4">
               <div className="flex items-center justify-between">
@@ -572,19 +563,19 @@ export default function NewDecisionPage() {
 
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6 space-y-4">
             <div>
-              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Project</h3>
+              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">{t('form.project')}</h3>
               <p className="text-neutral-900">{selectedProject?.name}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Decision Title</h3>
+              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">{t('form.cycleTitle')}</h3>
               <p className="text-neutral-900">{formData.title}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Hypothesis</h3>
+              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">{t('form.hypothesis')}</h3>
               <p className="text-neutral-900">{formData.hypothesis}</p>
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Success Criteria (OKR)</h3>
+              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">{t('form.successCriteria')}</h3>
               {(() => {
                 const okr = parseSuccessCriteriaToOKR(formData.successCriteria);
                 if (okr.keyResults.length > 0) {
@@ -611,7 +602,7 @@ export default function NewDecisionPage() {
               })()}
             </div>
             <div>
-              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">Out of Scope</h3>
+              <h3 className="font-semibold text-neutral-700 text-sm uppercase tracking-wide mb-2">{t('form.outOfScope')}</h3>
               <pre className="whitespace-pre-wrap text-neutral-600 font-sans text-sm">{formData.outOfScope}</pre>
             </div>
           </div>
@@ -620,7 +611,7 @@ export default function NewDecisionPage() {
               onClick={handleCreateDecision}
               className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover-lift transition-smooth shadow-sm"
             >
-              ✓ Create Decision Cycle
+              ✓ {t('form.create')}
             </button>
             <button
               onClick={() => {
@@ -651,39 +642,37 @@ export default function NewDecisionPage() {
 
   return (
     <div className="min-h-screen bg-gradient-editorial">
-      {/* Header */}
       <header className="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/app" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link href={`/${locale}/app`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg"></div>
-              <h1 className="text-xl font-bold">Decision OS</h1>
+              <h1 className="text-xl font-bold">{tCommon('appName')}</h1>
             </Link>
-            <span className="text-sm text-neutral-600">{user.name}</span>
+            <div className="flex items-center gap-4">
+              <LanguageSwitcher />
+              <span className="text-sm text-neutral-600">{user.name}</span>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-4xl mx-auto px-6 lg:px-8 py-12">
-        {/* Back Navigation */}
         <Link
-          href="/app"
+          href={`/${locale}/app`}
           className="inline-flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 mb-8 transition-colors"
         >
           <span>←</span>
-          <span>Back to Dashboard</span>
+          <span>{tCommon('backToDashboard')}</span>
         </Link>
 
-        {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">New Decision Cycle</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('title')}</h1>
           <p className="text-neutral-600">
             Let's structure your hypothesis and success criteria before you start building.
           </p>
         </div>
 
-        {/* Conversational Messages */}
         <div className="space-y-6 mb-24">
           {messages
             .filter((msg) => msg.visible)
@@ -710,7 +699,6 @@ export default function NewDecisionPage() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Area - Fixed Bottom */}
         {currentStep !== "confirm" && (
           <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-sm border-t border-neutral-200 p-6">
             <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
@@ -723,12 +711,12 @@ export default function NewDecisionPage() {
                     currentStep === "project"
                       ? "Type project name or number..."
                       : currentStep === "title"
-                      ? "e.g., Test new onboarding flow..."
+                      ? t('form.cycleTitlePlaceholder')
                       : currentStep === "hypothesis"
-                      ? "e.g., Simplifying signup will increase..."
+                      ? t('form.hypothesisPlaceholder')
                       : currentStep === "criteria"
-                      ? "e.g., - Conversion ≥ 65%..."
-                      : "e.g., - Social login (Phase 2)..."
+                      ? t('form.successCriteriaPlaceholder')
+                      : t('form.outOfScopePlaceholder')
                   }
                   className="flex-1 px-6 py-4 border-2 border-neutral-300 rounded-xl text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
                   autoFocus

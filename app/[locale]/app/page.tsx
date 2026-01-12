@@ -2,22 +2,27 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import Link from "next/link";
 import { mockProjects, mockCycles, calculateNorthStarMetrics } from "@/lib/mock-data";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function DashboardPage() {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations('dashboard');
+  const tCommon = useTranslations('common');
   const [user, setUser] = useState<any>(null);
   const [view, setView] = useState<"cards" | "list">("cards");
 
   useEffect(() => {
     const mockUser = localStorage.getItem("mockUser");
     if (!mockUser) {
-      router.push("/auth/login");
+      router.push(`/${locale}/auth/login`);
     } else {
       setUser(JSON.parse(mockUser));
     }
-  }, [router]);
+  }, [router, locale]);
 
   if (!user) return null;
 
@@ -29,7 +34,7 @@ export default function DashboardPage() {
           border: "border-amber-200",
           text: "text-amber-800",
           icon: "💡",
-          label: "Drafting"
+          label: t('cycles.status.DRAFTING')
         };
       case "EXECUTING":
         return {
@@ -37,7 +42,7 @@ export default function DashboardPage() {
           border: "border-blue-200",
           text: "text-blue-800",
           icon: "🔬",
-          label: "Executing"
+          label: t('cycles.status.EXECUTING')
         };
       case "REVIEW":
         return {
@@ -45,7 +50,7 @@ export default function DashboardPage() {
           border: "border-purple-200",
           text: "text-purple-800",
           icon: "📊",
-          label: "Review"
+          label: t('cycles.status.REVIEW')
         };
       case "OUTCOME":
         return {
@@ -53,7 +58,7 @@ export default function DashboardPage() {
           border: "border-teal-200",
           text: "text-teal-800",
           icon: "🎯",
-          label: "Outcome"
+          label: t('cycles.status.OUTCOME')
         };
       case "CLOSED":
         return {
@@ -61,7 +66,7 @@ export default function DashboardPage() {
           border: "border-neutral-200",
           text: "text-neutral-600",
           icon: "✅",
-          label: "Closed"
+          label: t('cycles.status.CLOSED')
         };
       default:
         return {
@@ -80,24 +85,25 @@ export default function DashboardPage() {
       <header className="bg-white/80 backdrop-blur-sm border-b border-neutral-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <Link href={`/${locale}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-8 h-8 bg-gradient-primary rounded-lg"></div>
-              <h1 className="text-xl font-bold">Decision OS</h1>
+              <h1 className="text-xl font-bold">{tCommon('appName')}</h1>
             </Link>
             <div className="flex items-center gap-4">
-              <Link href="/app/learning" className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 text-accent-dark rounded-lg text-sm font-medium hover:bg-accent/20 transition-colors">
+              <Link href={`/${locale}/app/learning`} className="flex items-center gap-2 px-3 py-1.5 bg-accent/10 text-accent-dark rounded-lg text-sm font-medium hover:bg-accent/20 transition-colors">
                 <span>🧠</span>
-                <span>Learning</span>
+                <span>{tCommon('learning')}</span>
               </Link>
+              <LanguageSwitcher />
               <span className="text-sm text-neutral-600">{user.name}</span>
               <button
                 onClick={() => {
                   localStorage.removeItem("mockUser");
-                  router.push("/");
+                  router.push(`/${locale}`);
                 }}
                 className="text-sm text-neutral-600 hover:text-neutral-900 transition-colors"
               >
-                Logout
+                {tCommon('logout')}
               </button>
             </div>
           </div>
@@ -119,10 +125,10 @@ export default function DashboardPage() {
                   <div>
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl">🎯</span>
-                      <h2 className="text-xl font-bold text-neutral-900">North Star Metric</h2>
+                      <h2 className="text-xl font-bold text-neutral-900">{t('northStar.title')}</h2>
                     </div>
                     <p className="text-sm text-neutral-600">
-                      The ONE metric that matters: decisions backed by data, not guesses
+                      {t('northStar.description')}
                     </p>
                   </div>
                 </div>
@@ -132,7 +138,7 @@ export default function DashboardPage() {
                   <div>
                     <div className="mb-4">
                       <div className="text-sm font-semibold text-neutral-600 uppercase tracking-wide mb-2">
-                        Validated Decision Rate
+                        {t('northStar.validatedDecisionRate')}
                       </div>
                       <div className="flex items-baseline gap-3">
                         <span className="text-6xl font-bold text-primary">
@@ -143,7 +149,7 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       <div className="text-sm text-neutral-600 mt-2">
-                        {northStar.breakdown.validated} validated / {northStar.breakdown.total} total decisions
+                        {t('northStar.validatedOf', { validated: northStar.breakdown.validated, total: northStar.breakdown.total })}
                       </div>
                     </div>
 
@@ -151,15 +157,15 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-3 gap-3">
                       <div className="bg-white rounded-lg p-3 border border-neutral-200">
                         <div className="text-2xl font-bold text-success">{northStar.breakdown.validated}</div>
-                        <div className="text-xs text-neutral-600">Validated</div>
+                        <div className="text-xs text-neutral-600">{t('northStar.breakdown.validated')}</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 border border-neutral-200">
                         <div className="text-2xl font-bold text-error">{northStar.breakdown.notValidated}</div>
-                        <div className="text-xs text-neutral-600">Not Validated</div>
+                        <div className="text-xs text-neutral-600">{t('northStar.breakdown.notValidated')}</div>
                       </div>
                       <div className="bg-white rounded-lg p-3 border border-neutral-200">
                         <div className="text-2xl font-bold text-info">{northStar.breakdown.pending}</div>
-                        <div className="text-xs text-neutral-600">Pending</div>
+                        <div className="text-xs text-neutral-600">{t('northStar.breakdown.pending')}</div>
                       </div>
                     </div>
                   </div>
@@ -167,7 +173,7 @@ export default function DashboardPage() {
                   {/* Trend Chart */}
                   <div>
                     <div className="text-sm font-semibold text-neutral-600 uppercase tracking-wide mb-4">
-                      Learning Curve (Last 4 Months)
+                      {t('northStar.learningCurve')}
                     </div>
                     <div className="bg-white rounded-lg p-4 border border-neutral-200">
                       {/* Simple bar chart */}
@@ -189,7 +195,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="text-xs text-neutral-500 mt-3 italic">
-                      📈 Your team is learning: {northStar.history[0].rate}% → {northStar.validatedDecisionRate}%
+                      📈 {t('northStar.teamLearning', { from: northStar.history[0].rate, to: northStar.validatedDecisionRate })}
                     </div>
                   </div>
                 </div>
@@ -199,9 +205,8 @@ export default function DashboardPage() {
                   <div className="flex items-start gap-3">
                     <span className="text-lg">💡</span>
                     <div className="text-sm text-neutral-700">
-                      <strong>Why this matters:</strong> High validation rate = decisions backed by evidence, not opinions.
-                      Low rate = learning opportunity (better hypotheses next time).
-                      <strong className="text-primary">GitHub Issues can't track this.</strong>
+                      <strong>{t('northStar.whyMatters.title')}</strong> {t('northStar.whyMatters.description')}
+                      <strong className="text-primary">{t('northStar.whyMatters.githubCant')}</strong>
                     </div>
                   </div>
                 </div>
@@ -214,32 +219,32 @@ export default function DashboardPage() {
         <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6">
             <div className="text-3xl font-bold text-neutral-900 mb-1">{mockProjects.length}</div>
-            <div className="text-sm text-neutral-600">Active Projects</div>
+            <div className="text-sm text-neutral-600">{t('stats.activeProjects')}</div>
           </div>
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6">
             <div className="text-3xl font-bold text-neutral-900 mb-1">{mockCycles.length}</div>
-            <div className="text-sm text-neutral-600">Total Decisions</div>
+            <div className="text-sm text-neutral-600">{t('stats.totalDecisions')}</div>
           </div>
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6">
             <div className="text-3xl font-bold text-success mb-1">
               {mockCycles.filter(c => c.status === "CLOSED").length}
             </div>
-            <div className="text-sm text-neutral-600">Completed</div>
+            <div className="text-sm text-neutral-600">{t('stats.completed')}</div>
           </div>
           <div className="bg-white border-2 border-neutral-200 rounded-xl p-6">
             <div className="text-3xl font-bold text-info mb-1">
               {mockCycles.filter(c => c.status === "EXECUTING").length}
             </div>
-            <div className="text-sm text-neutral-600">In Progress</div>
+            <div className="text-sm text-neutral-600">{t('stats.inProgress')}</div>
           </div>
         </section>
 
         {/* Projects Section */}
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Projects</h2>
+            <h2 className="text-2xl font-bold">{t('projects.title')}</h2>
             <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover-lift transition-smooth shadow-sm">
-              New Project
+              {t('projects.newProject')}
             </button>
           </div>
 
@@ -247,18 +252,18 @@ export default function DashboardPage() {
             {mockProjects.map((project) => (
               <Link
                 key={project.id}
-                href={`/app/projects/${project.id}`}
+                href={`/${locale}/app/projects/${project.id}`}
                 className="group block bg-white border-2 border-neutral-200 rounded-xl p-6 hover:border-primary hover-lift transition-smooth"
               >
                 <div className="flex items-start justify-between mb-4">
                   <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">{project.name}</h3>
                   {project.githubConnection ? (
                     <span className="text-xs px-2 py-1 bg-success/10 text-success rounded-full font-medium">
-                      Connected
+                      {t('projects.connected')}
                     </span>
                   ) : (
                     <span className="text-xs px-2 py-1 bg-neutral-100 text-neutral-600 rounded-full">
-                      Not Connected
+                      {t('projects.notConnected')}
                     </span>
                   )}
                 </div>
@@ -268,7 +273,7 @@ export default function DashboardPage() {
                   </p>
                 )}
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-neutral-600 font-medium">{project.cycleCount} cycles</span>
+                  <span className="text-neutral-600 font-medium">{project.cycleCount} {t('projects.cycles')}</span>
                   <span className="text-neutral-400">{project.updatedAt.toLocaleDateString()}</span>
                 </div>
               </Link>
@@ -279,7 +284,7 @@ export default function DashboardPage() {
         {/* Decision Cycles */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold">Recent Decisions</h2>
+            <h2 className="text-2xl font-bold">{t('cycles.title')}</h2>
             <div className="flex items-center gap-4">
               {/* View Toggle */}
               <div className="flex items-center gap-2 bg-white border border-neutral-200 rounded-lg p-1">
@@ -291,7 +296,7 @@ export default function DashboardPage() {
                       : "text-neutral-600 hover:text-neutral-900"
                   }`}
                 >
-                  Cards
+                  {t('cycles.views.cards')}
                 </button>
                 <button
                   onClick={() => setView("list")}
@@ -301,15 +306,15 @@ export default function DashboardPage() {
                       : "text-neutral-600 hover:text-neutral-900"
                   }`}
                 >
-                  List
+                  {t('cycles.views.list')}
                 </button>
               </div>
 
               <button
-                onClick={() => router.push("/app/cycles/new")}
+                onClick={() => router.push(`/${locale}/app/cycles/new`)}
                 className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover-lift transition-smooth shadow-sm"
               >
-                New Decision
+                {t('cycles.newCycle')}
               </button>
             </div>
           </div>
@@ -322,7 +327,7 @@ export default function DashboardPage() {
                 return (
                   <div
                     key={cycle.id}
-                    onClick={() => router.push(`/app/cycles/${cycle.id}`)}
+                    onClick={() => router.push(`/${locale}/app/cycles/${cycle.id}`)}
                     className={`cursor-pointer bg-white border-2 ${statusConfig.border} rounded-xl p-6 hover-lift transition-smooth group`}
                   >
                     {/* Status Badge */}
@@ -356,7 +361,7 @@ export default function DashboardPage() {
                       {cycle.evidence && cycle.evidence.length > 0 && (
                         <div className="flex items-center gap-1">
                           <span>📎</span>
-                          <span>{cycle.evidence.length} evidence</span>
+                          <span>{cycle.evidence.length} {t('cycles.evidence')}</span>
                         </div>
                       )}
                     </div>
@@ -373,16 +378,16 @@ export default function DashboardPage() {
                 <thead className="bg-neutral-50 border-b border-neutral-200">
                   <tr>
                     <th className="text-left px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                      Decision
+                      {t('cycles.columns.cycle')}
                     </th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                      Project
+                      {t('cycles.columns.project')}
                     </th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                      Status
+                      {t('cycles.columns.status')}
                     </th>
                     <th className="text-left px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">
-                      Updated
+                      {t('cycles.columns.updated')}
                     </th>
                   </tr>
                 </thead>
@@ -393,7 +398,7 @@ export default function DashboardPage() {
                       <tr
                         key={cycle.id}
                         className="hover:bg-neutral-50 cursor-pointer transition-colors"
-                        onClick={() => router.push(`/app/cycles/${cycle.id}`)}
+                        onClick={() => router.push(`/${locale}/app/cycles/${cycle.id}`)}
                       >
                         <td className="px-6 py-4">
                           <div className="font-medium text-neutral-900">{cycle.title}</div>
